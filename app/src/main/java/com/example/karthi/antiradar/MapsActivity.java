@@ -2,6 +2,7 @@ package com.example.karthi.antiradar;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -9,6 +10,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -38,9 +43,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        // PArse Json radar
+        JSONObject json = SpeedCamParse.readJsonFromUrl("http://speedcamlocator.livehost.fr/radarFR");
+
+        Log.i("test_log",json);
+        
         // Add a marker in Paris and move the camera
-        LatLng paris = new LatLng(48,2);
-        mMap.addMarker(new MarkerOptions().position(paris).title("Marker in Paris"));
+        LatLng paris = new LatLng(45.76344,4.80272);
+        mMap.addMarker(new MarkerOptions().position(paris).title("Radar F-70"));
+
+
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(paris));
         mMap.animateCamera( CameraUpdateFactory.zoomTo( 5.0f ) );
     }
