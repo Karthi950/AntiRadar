@@ -1,40 +1,54 @@
 package com.example.karthi.antiradar;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.content.ContextCompat;
+import android.widget.ListView;
 
+import com.example.karthi.antiradar.asynctasks.LoadRadarsAsyncTask;
+import com.example.karthi.antiradar.model.Radar;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
+
+    private static List<Radar> listRadars = new ArrayList<>();
+
+    public ListView listView;
+    public Context context;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
-
 
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
      * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
+     * we just add a marker near Paris, France.
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
@@ -43,18 +57,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // PArse Json radar
-        JSONObject json = SpeedCamParse.readJsonFromUrl("http://speedcamlocator.livehost.fr/radarFR");
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
 
-        Log.i("test_log",json);
-        
-        // Add a marker in Paris and move the camera
-        LatLng paris = new LatLng(45.76344,4.80272);
-        mMap.addMarker(new MarkerOptions().position(paris).title("Radar F-70"));
+            LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
+            Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(paris));
-        mMap.animateCamera( CameraUpdateFactory.zoomTo( 5.0f ) );
+            if (location != null) {
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(new LatLng(location.getLatitude(), location.getLongitude()))
+                        .zoom(100)
+                        .build();
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            }
+        }
+        LoadRadarsAsyncTask task = new LoadRadarsAsyncTask(context , listView);
+        task.execute();
     }
+
+    public static void addRadarsToMap(List<Radar> listRadars) {
+        MapsActivity.listRadars = listRadars;
+        for (Radar radar : listRadars) {
+            LatLng radarLatLong = new LatLng(radar.getLatitude(), radar.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(radarLatLong).title(radar.getPaysVitesse()));
+        }
+    }
+
 }
