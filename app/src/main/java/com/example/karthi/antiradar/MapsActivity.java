@@ -3,6 +3,8 @@ package com.example.karthi.antiradar;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
@@ -16,6 +18,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -34,6 +37,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public ListView listView;
     public Context context;
+
+
+
 
 
     @Override
@@ -78,10 +84,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public static void addRadarsToMap(List<Radar> listRadars) {
         MapsActivity.listRadars = listRadars;
+
+
         for (Radar radar : listRadars) {
             LatLng radarLatLong = new LatLng(radar.getLatitude(), radar.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(radarLatLong).title(radar.getPaysVitesse()));
+            mMap.addMarker(
+                    new MarkerOptions()
+                            .position(radarLatLong)
+                            .title("Info Vitesse : " + radar.getVitesse())
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.cam))
+            );
         }
+
+        LatLng latlng = new LatLng(44.03836, 4.88396);
+
+
+        // Move the camera instantly to location with a zoom of 15.
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 15));
+
+        // Zoom in, animating the camera.
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(14), 2000, null);
     }
 
 }
