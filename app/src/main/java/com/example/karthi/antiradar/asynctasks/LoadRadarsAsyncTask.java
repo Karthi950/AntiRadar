@@ -59,7 +59,8 @@ public class LoadRadarsAsyncTask extends AsyncTask<Void, Void, List<Radar>> {
 
     @Override
     protected void onPostExecute(List<Radar> result) {
-        MapsActivity.addRadarsToMap(result);
+        //MapsActivity.addRadarsToMap(result);
+
     }
 
     public static JSONArray getJsonFromServer(String url) throws IOException {
