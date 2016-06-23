@@ -1,5 +1,6 @@
 package com.example.karthi.antiradar.Utils;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
@@ -8,9 +9,15 @@ import com.google.maps.android.clustering.ClusterItem;
  */
 public class MyItem implements ClusterItem {
     private final LatLng mPosition;
+    BitmapDescriptor icon;
+    String title;
+    String snippet;
 
-    public MyItem(double lat, double lng) {
+    public MyItem(BitmapDescriptor ic,Float lat , Float lng,String tit ,String sni) {
         mPosition = new LatLng(lat, lng);
+        icon = ic;
+        title = tit;
+        snippet = sni;
     }
 
     @Override

@@ -17,6 +17,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterManager;
@@ -29,7 +30,7 @@ import java.util.List;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private static GoogleMap mMap;
-    private ClusterManager<MyItem> mClusterManager;
+    private static ClusterManager<MyItem> mClusterManager;
 
     private static List<Radar> listRadars = new ArrayList<>();
 
@@ -124,16 +125,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-        addItems();
+        //addItems();
 
     }
 
 
 
-    private void addItems() {
+    public static void addRadarsToMap(List<Radar> listRadars)  {
 
         // Set some lat/lng coordinates to start with.
-        double lat = 51.5145160;
+       /* double lat = 51.5145160;
         double lng = -0.1270060;
 
         // Add ten cluster items in close proximity, for purposes of this example.
@@ -141,9 +142,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 double offset = i / 60d;
                 lat = lat + offset;
                 lng = lng + offset;
-                MyItem offsetItem = new MyItem(lat, lng);
+                MyItem offsetItem = new MyItem(BitmapDescriptorFactory.fromResource(R.drawable.cam),lat, lng,"test","test1");
                 mClusterManager.addItem(offsetItem);
         }
+
+        */
+        MapsActivity.listRadars = listRadars;
+
+
+        for (Radar radar : listRadars) {
+            //LatLng radarLatLong = new LatLng(radar.getLatitude(), radar.getLongitude());
+            MyItem offsetItem = new MyItem(BitmapDescriptorFactory.fromResource(R.drawable.cam),radar.getLatitude(), radar.getLongitude(),"test","test1");
+            mClusterManager.addItem(offsetItem);
+
+        }
+
+
+
     }
 
 
