@@ -1,25 +1,23 @@
 package com.example.karthi.antiradar;
 
-import android.Manifest;
+
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationManager;
+
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+
 import android.widget.ListView;
 
 import com.example.karthi.antiradar.Utils.MyItem;
+import com.example.karthi.antiradar.Utils.OwnRendring;
 import com.example.karthi.antiradar.asynctasks.LoadRadarsAsyncTask;
 import com.example.karthi.antiradar.model.Radar;
-import com.google.android.gms.maps.CameraUpdateFactory;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
+
 import com.google.maps.android.clustering.ClusterManager;
 
 
@@ -62,7 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        /*if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
 
@@ -76,7 +74,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .build();
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
-        }
+        }*/
         LoadRadarsAsyncTask task = new LoadRadarsAsyncTask(context , listView);
         setUpClusterer();
         task.execute();
@@ -112,7 +110,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         // Position the map.
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.503186, -0.126446), 10));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.503186, -0.126446), 10));
 
         // Initialize the manager with the context and the map.
         // (Activity extends context, so we can pass 'this' in the constructor.)
@@ -123,9 +121,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnCameraChangeListener(mClusterManager);
         mMap.setOnMarkerClickListener(mClusterManager);
 
+        mClusterManager.setRenderer(new OwnRendring(getApplicationContext(), mMap, mClusterManager));
 
-
-        //addItems();
+       // addItems();
 
     }
 
@@ -133,26 +131,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public static void addRadarsToMap(List<Radar> listRadars)  {
 
-        // Set some lat/lng coordinates to start with.
-       /* double lat = 51.5145160;
-        double lng = -0.1270060;
-
-        // Add ten cluster items in close proximity, for purposes of this example.
-        for (int i = 0; i < 10; i++) {
-                double offset = i / 60d;
-                lat = lat + offset;
-                lng = lng + offset;
-                MyItem offsetItem = new MyItem(BitmapDescriptorFactory.fromResource(R.drawable.cam),lat, lng,"test","test1");
-                mClusterManager.addItem(offsetItem);
-        }
-
-        */
-        MapsActivity.listRadars = listRadars;
+          MapsActivity.listRadars = listRadars;
 
 
         for (Radar radar : listRadars) {
             //LatLng radarLatLong = new LatLng(radar.getLatitude(), radar.getLongitude());
-            MyItem offsetItem = new MyItem(BitmapDescriptorFactory.fromResource(R.drawable.cam),radar.getLatitude(), radar.getLongitude(),"test","test1");
+            MyItem offsetItem = new MyItem(BitmapDescriptorFactory.fromResource(R.drawable.cammin),radar.getLatitude(), radar.getLongitude(),"Info Vitesse : " +radar.getVitesse(),"Radar fixe");
             mClusterManager.addItem(offsetItem);
 
         }
@@ -160,6 +144,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
+
+
+    private void addItems()  {
+
+        // Set some lat/lng coordinates to start with.
+        double lat = 51.5145160;
+        double lng = -0.1270060;
+
+        // Add ten cluster items in close proximity, for purposes of this example.
+        for (int i = 0; i < 10; i++) {
+            double offset = i / 60d;
+            lat = lat + offset;
+            lng = lng + offset;
+            MyItem offsetItem = new MyItem(BitmapDescriptorFactory.fromResource(R.drawable.cammin),lat, lng,"test","test1");
+            mClusterManager.addItem(offsetItem);
+        }
+
+
+
+    }
+
+
 
 
 

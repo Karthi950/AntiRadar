@@ -13,7 +13,7 @@ public class MyItem implements ClusterItem {
     String title;
     String snippet;
 
-    public MyItem(BitmapDescriptor ic,Float lat , Float lng,String tit ,String sni) {
+    public MyItem(BitmapDescriptor ic,double lat , double lng,String tit ,String sni) {
         mPosition = new LatLng(lat, lng);
         icon = ic;
         title = tit;
@@ -23,5 +23,17 @@ public class MyItem implements ClusterItem {
     @Override
     public LatLng getPosition() {
         return mPosition;
+    }
+
+    public BitmapDescriptor getIcon() {
+        return icon;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getSnippet() {
+        return snippet;
     }
 }
