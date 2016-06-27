@@ -3,9 +3,12 @@ package com.example.karthi.antiradar;
 
 import android.content.Context;
 
+import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.example.karthi.antiradar.Utils.MyItem;
@@ -13,11 +16,14 @@ import com.example.karthi.antiradar.Utils.OwnRendring;
 import com.example.karthi.antiradar.asynctasks.LoadRadarsAsyncTask;
 import com.example.karthi.antiradar.model.Radar;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterManager;
 
 
@@ -45,17 +51,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Paris, France.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -106,14 +108,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }*/
 
     private void setUpClusterer() {
-        // Declare a variable for the cluster manager.
-
 
         // Position the map.
         //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.503186, -0.126446), 10));
 
-        // Initialize the manager with the context and the map.
-        // (Activity extends context, so we can pass 'this' in the constructor.)
         mClusterManager = new ClusterManager<MyItem>(this, mMap);
 
         // Point the map's listeners at the listeners implemented by the cluster
@@ -148,11 +146,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void addItems()  {
 
-        // Set some lat/lng coordinates to start with.
+
         double lat = 51.5145160;
         double lng = -0.1270060;
 
-        // Add ten cluster items in close proximity, for purposes of this example.
+
         for (int i = 0; i < 10; i++) {
             double offset = i / 60d;
             lat = lat + offset;
