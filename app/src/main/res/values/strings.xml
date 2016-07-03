@@ -2,31 +2,36 @@
     <string name="app_name">SpeedCamLocator</string>
     <string name="title_activity_maps">SpeedCamLocator</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_settings">Paramètres</string>
 
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
 
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
+    <string name="title_radar_fixe_switch">Radar Fixe</string>
+    <string name="description_radar_fixe_switch">Afficher/Masquer les radars fixes
+    </string>
+
+    <string name="title_radar_feu_switch">Radar feu rouge</string>
+    <string name="description_radar_feu_switch">Afficher/Masquer les radars de feux rouges
     </string>
 
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">John Smith</string>
 
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
+    <string name="pref_title_zoom_level">Niveau zoom lors du démarrage</string>
+    <string-array name="pref_zoom_level">
+        <item>Monde</item>
+        <item>Pays</item>
+        <item>Région</item>
+        <item>Ville</item>
     </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
+    <string-array name="pref_list_values_zoom_level">
         <item>0</item>
-        <item>-1</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
     </string-array>
 
     <!-- Example settings for Data & Sync -->

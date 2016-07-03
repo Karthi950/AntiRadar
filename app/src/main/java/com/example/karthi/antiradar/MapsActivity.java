@@ -1,5 +1,6 @@
 package com.example.karthi.antiradar;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -88,7 +89,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            setContentView(R.layout.setting_layout);
+            Intent intent = new Intent(this, SettingsActivity.class);
+            this.startActivity(intent);
+
             Log.d("MENU Setting","yo je suis dans le menu setting");
             return true;
         }
