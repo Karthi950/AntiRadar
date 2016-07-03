@@ -13,8 +13,8 @@
         android:title="@string/pref_header_notifications" />
 
     <header
-        android:fragment="com.example.karthi.antiradar.SettingsActivity$DataSyncPreferenceFragment"
+        android:fragment="com.example.karthi.antiradar.SettingsActivity$WidgetPreferenceFragment"
         android:icon="@drawable/ic_sync_black_24dp"
-        android:title="@string/pref_header_data_sync" />
+        android:title="@string/pref_header_widget" />
 
 </preference-headers>
