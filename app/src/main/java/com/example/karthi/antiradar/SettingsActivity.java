@@ -17,8 +17,10 @@ import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 
 import java.util.List;
 
@@ -131,6 +133,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
     }
 
     /**
@@ -179,7 +182,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // guidelines.
 
             bindPreferenceSummaryToValue(findPreference("pref_list_zoom_start")); // attention
+
         }
+
+
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {

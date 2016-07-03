@@ -1,7 +1,10 @@
 package com.example.karthi.antiradar;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -70,6 +73,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+
     }
 
 
@@ -85,12 +90,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        preferenceGeneralZoom();
+
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             this.startActivity(intent);
+
 
             Log.d("MENU Setting","yo je suis dans le menu setting");
             return true;
@@ -123,6 +131,40 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         task.execute();
     }
 
+    public void preferenceGeneralZoom() {
+
+
+        LatLng latlng = new LatLng(47.18373, 2.5268);
+
+
+        // Move the camera instantly to location with a zoom of 15.
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 15));
+
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        boolean test2 = preferences.getBoolean("radar_fixe_switch", false );
+        Log.d("test2", Boolean.toString(test2));
+
+        String prefZoom = preferences.getString("pref_list_zoom_start","0");
+
+
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(Integer.parseInt(prefZoom)), 2000, null);
+
+        Log.d("test3", prefZoom);
+
+
+
+
+
+
+    }
+
+    public void preferenceWidget() {
+
+
+    }
+
   /*  public static void addRadarsToMap(List<Radar> listRadars) {
 
         ArrayList<Marker> radarFixe = new ArrayList<Marker>();
@@ -150,7 +192,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 /*
-        LatLng latlng = new LatLng(44.03836, 4.88396);
+        LatLng latlng = new LatLng(47.18373, 2.5268);
 
 
         // Move the camera instantly to location with a zoom of 15.
@@ -174,6 +216,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mClusterManager.setRenderer(new OwnRendring(getApplicationContext(), mMap, mClusterManager));
 
+
+        // Zoom in, animating the camera.
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(14), 2000, null);
        // addItems();
 
     }
@@ -192,7 +237,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         }
 
-
+       // mClusterManager.remo
 
     }
 
