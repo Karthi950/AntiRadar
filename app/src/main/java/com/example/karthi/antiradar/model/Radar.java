@@ -1,61 +1,52 @@
 package com.example.karthi.antiradar.model;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+
 /**
  * Created by Karthi on 19/06/2016.
  */
-public class Radar {
+public class Radar implements ClusterItem {
 
-    private float latitude;
-    private float longitude;
-    private String paysVitesse;
-    private String pays;
-    private int vitesse;
+    private BitmapDescriptor icon;
+    private LatLng position;
+    private String title;
+    private String snippet;
 
-    public Radar(float latitude, float longitude, String paysVitesse, String pays, int vitesse) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.paysVitesse = paysVitesse;
-        this.pays = pays;
-        this.vitesse = vitesse;
+    public Radar(BitmapDescriptor icon, float latitude, float longitude, String title, String snippet) {
+        this.icon = icon;
+        this.position = new LatLng(latitude, longitude);
+        this.title = title;
+        this.snippet = snippet;
     }
 
-    public float getLatitude() {
-        return latitude;
+    @Override
+    public LatLng getPosition() {
+        return position;
     }
 
-    public void setLatitude(float latitude) {
-        this.latitude = latitude;
+    public BitmapDescriptor getIcon() {
+        return icon;
     }
 
-    public float getLongitude() {
-        return longitude;
+    public void setIcon(BitmapDescriptor icon) {
+        this.icon = icon;
     }
 
-    public void setLongitude(float longitude) {
-        this.longitude = longitude;
+    public String getSnippet() {
+        return snippet;
     }
 
-    public String getPays() {
-        return pays;
+    public void setSnippet(String snippet) {
+        this.snippet = snippet;
     }
 
-    public void setPays(String pays) {
-        this.pays = pays;
+    public String getTitle() {
+        return title;
     }
 
-    public String getPaysVitesse() {
-        return paysVitesse;
-    }
-
-    public void setPaysVitesse(String paysVitesse) {
-        this.paysVitesse = paysVitesse;
-    }
-
-    public int getVitesse() {
-        return vitesse;
-    }
-
-    public void setVitesse(int vitesse) {
-        this.vitesse = vitesse;
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

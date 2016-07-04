@@ -7,7 +7,9 @@ import android.util.Log;
 import android.widget.ListView;
 
 import com.example.karthi.antiradar.MapsActivity;
+import com.example.karthi.antiradar.R;
 import com.example.karthi.antiradar.model.Radar;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,11 +45,11 @@ public class LoadRadarsAsyncTask extends AsyncTask<Void, Void, List<Radar>> {
             JSONArray jsonString = getJsonFromServer(SITE_RADARS_URL);
             for (int i = 0; i < jsonString.length(); i++) {
                 JSONObject radarJSON = jsonString.getJSONObject(i);
-                radarList.add(new Radar(Float.parseFloat(radarJSON.getString("Latitude")),
+                radarList.add(new Radar(BitmapDescriptorFactory.fromResource(R.drawable.cammin),
+                        Float.parseFloat(radarJSON.getString("Latitude")),
                         Float.parseFloat(radarJSON.getString("Longitude")),
-                        radarJSON.getString("PaysVitesse"),
-                        radarJSON.getString("Pays"),
-                        Integer.parseInt(radarJSON.getString("Vitesse"))));
+                        radarJSON.getString("Vitesse")+ " km/h",
+                        "Radar Fixe"));
             }
         }
         catch (IOException | JSONException error) {

@@ -1,12 +1,16 @@
 package com.example.karthi.antiradar;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -26,8 +30,10 @@ import android.widget.ListView;
 import com.example.karthi.antiradar.Utils.MyItem;
 import com.example.karthi.antiradar.Utils.OwnRendring;
 import com.example.karthi.antiradar.asynctasks.LoadRadarsAsyncTask;
+import com.example.karthi.antiradar.model.OwnRendering;
 import com.example.karthi.antiradar.model.Radar;
 
+import com.example.karthi.antiradar.services.GPSLocator;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -41,7 +47,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,17 +54,21 @@ import java.util.List;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static GoogleMap mMap;
-    private static ClusterManager<MyItem> mClusterManager;
+    private LocationManager locationManager;
+    private Location location;
+    private GPSLocator gpsLocator = new GPSLocator();
+    private static ClusterManager<Radar> mClusterManager;
 
     private static List<Radar> listRadars = new ArrayList<>();
-
-
 
     public ListView listView;
     public Context context;
 
-    private Marker radarFixe;
+    private long timeUpdate = 10;
+    private float distanceUpdate = 1;
+    private static float zoom = 5;
 
+    private Marker radarFixe;
 
 
     @Override
@@ -72,8 +81,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
 
     }
 
@@ -111,23 +118,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        /*if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        mClusterManager = new ClusterManager<Radar>(this, mMap);
+        mMap.setOnCameraChangeListener(mClusterManager);
+        mMap.setOnMarkerClickListener(mClusterManager);
+        mClusterManager.setRenderer(new OwnRendering(getApplicationContext(), mMap, mClusterManager));
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
 
-            LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
-            Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, timeUpdate, distanceUpdate, gpsLocator);
 
             if (location != null) {
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(new LatLng(location.getLatitude(), location.getLongitude()))
-                        .zoom(100)
+                        .zoom(zoom)
                         .build();
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
-        }*/
+        }
+
         LoadRadarsAsyncTask task = new LoadRadarsAsyncTask(context , listView);
-        setUpClusterer();
         task.execute();
     }
 
@@ -148,8 +161,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         String prefZoom = preferences.getString("pref_list_zoom_start","0");
 
-
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(Integer.parseInt(prefZoom)), 2000, null);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, Float.parseFloat(prefZoom)) );
+        //mMap.animateCamera(CameraUpdateFactory.zoomTo(Integer.parseInt(prefZoom)), 2000, null);
 
         Log.d("test3", prefZoom);
 
@@ -163,6 +176,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void preferenceWidget() {
 
 
+    }
+
+    public static void addRadarsToMap(List<Radar> listRadars) {
+        MapsActivity.listRadars = listRadars;
+        for (Radar radar : listRadars) {
+            MapsActivity.mClusterManager.addItem(radar);
+            /*
+            LatLng radarLatLong = radar.getPosition();
+            mMap.addMarker(
+                    new MarkerOptions()
+                            .position(radarLatLong)
+                            .title("Info Vitesse : " + radar.getVitesse() + " km/h")
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.cam))
+                            .snippet("Radar Fixe")
+            );
+            */
+        }
+        LatLng latlng = new LatLng(50, 50);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, zoom));
+
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(zoom), 2000, null);
     }
 
   /*  public static void addRadarsToMap(List<Radar> listRadars) {
@@ -202,29 +236,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.animateCamera(CameraUpdateFactory.zoomTo(14), 2000, null);
     }
 */
-    private void setUpClusterer() {
-
-        // Position the map.
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.503186, -0.126446), 10));
-
-        mClusterManager = new ClusterManager<MyItem>(this, mMap);
-
-        // Point the map's listeners at the listeners implemented by the cluster
-        // manager.
-        mMap.setOnCameraChangeListener(mClusterManager);
-        mMap.setOnMarkerClickListener(mClusterManager);
-
-        mClusterManager.setRenderer(new OwnRendring(getApplicationContext(), mMap, mClusterManager));
 
 
-        // Zoom in, animating the camera.
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(14), 2000, null);
-       // addItems();
-
-    }
-
-
-
+    /*
     public static void addRadarsToMap(List<Radar> listRadars)  {
 
           MapsActivity.listRadars = listRadars;
@@ -239,9 +253,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
        // mClusterManager.remo
 
-    }
+    }*/
 
-
+/*
     private void addItems()  {
 
 
@@ -260,9 +274,5 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     }
-
-
-
-
-
+    */
 }
