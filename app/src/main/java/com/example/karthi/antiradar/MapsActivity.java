@@ -148,8 +148,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         String prefZoom = preferences.getString("pref_list_zoom_start","0");
 
-
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(Integer.parseInt(prefZoom)), 2000, null);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, Float.parseFloat(prefZoom)) );
+       // mMap.animateCamera(CameraUpdateFactory.zoomTo(Integer.parseInt(prefZoom)), 2000, null);
 
         Log.d("test3", prefZoom);
 

@@ -28,10 +28,10 @@
         <item>Ville</item>
     </string-array>
     <string-array name="pref_list_values_zoom_level">
-        <item>0</item>
-        <item>5</item>
-        <item>10</item>
         <item>15</item>
+        <item>10</item>
+        <item>5</item>
+        <item>0</item>
     </string-array>
 
     <!-- Example settings for Data & Sync -->
