@@ -1,19 +1,28 @@
 package com.example.karthi.antiradar.services;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.widget.Toast;
+import android.os.Vibrator;
+import android.util.Log;
+import android.os.Vibrator;
+
+import com.example.karthi.antiradar.MapsActivity;
+import com.example.karthi.antiradar.model.Radar;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by Arnaud on 22/06/2016.
  */
 public class GPSLocator extends Service implements LocationListener {
 
-    Intent intent;
+    public static LatLng currentLocation;
+
+    Intent intent = new Intent();
 
    /* @Override
     public void onStart(Intent intent, int startId) {
@@ -26,14 +35,26 @@ public class GPSLocator extends Service implements LocationListener {
 
     }*/
 
-    public void onLocationChanged(final Location loc) {
-        Toast.makeText(getApplicationContext(), loc.toString(), Toast.LENGTH_LONG).show();
-        System.out.println("CHANGEMENT DE LOC "+loc.toString());
-        loc.getLatitude();
-        loc.getLongitude();
-        intent.putExtra("Latitude", loc.getLatitude());
-        intent.putExtra("Longitude", loc.getLongitude());
-        intent.putExtra("Provider", loc.getProvider());
+    public void onLocationChanged(final Location newLocation) {
+        //Toast.makeText(getApplicationContext(), loc.toString(), Toast.LENGTH_LONG).show();
+        Log.i("PREVIOUS LOC", "CHANGEMENT DE LOC " + currentLocation.toString());
+        Log.i("LOC CHANGED", "CHANGEMENT DE LOC " + newLocation.toString());
+        System.out.println("CHANGEMENT LOCATION");
+        float[] distanceInMeters = new float[1];
+        Location.distanceBetween(newLocation.getLatitude(), newLocation.getLongitude(), currentLocation.latitude, currentLocation.longitude, distanceInMeters);
+        System.out.println("Distance parcourue " + distanceInMeters[0]);
+
+        int closeRadars = 0;
+
+        for (Radar radar : MapsActivity.listRadars) {
+            //Location location = new Location("Radar");
+            float[] distance = new float[1];
+            Location.distanceBetween(newLocation.getLatitude(), newLocation.getLongitude(), radar.getPosition().latitude, radar.getPosition().longitude, distance);
+            System.out.println("Distance " + distance[0]);
+        }
+
+        intent.putExtra("Latitude", newLocation.getLatitude());
+
         //sendBroadcast(intent);
     }
 

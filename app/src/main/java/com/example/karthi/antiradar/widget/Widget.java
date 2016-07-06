@@ -3,6 +3,7 @@ package com.example.karthi.antiradar.widget;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
+import android.os.Vibrator;
 
 /**
  * Created by Arnaud on 22/06/2016.
@@ -18,6 +19,9 @@ public class Widget extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        System.out.println("VIBRATION");
+        v.vibrate(500);
         /*super.onUpdate(context, appWidgetManager, appWidgetIds);
         for (int appWidgetId : appWidgetIds) {
             updateWidget(context, appWidgetManager, appWidgetId, new Date().toString());
