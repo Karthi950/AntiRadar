@@ -58,27 +58,54 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Location location;
     private GPSLocator gpsLocator = new GPSLocator();
     private static ClusterManager<Radar> mClusterManager;
-
     public static List<Radar> listRadars = new ArrayList<>();
-
     public ListView listView;
     public Context context;
 
-    private  long timeUpdate = 10;
-    private float distanceUpdate = 1;
+    /* Préférences */
 
+    private SharedPreferences preferences;
+
+    private long timeUpdate = 10;
+    private float distanceUpdate = 1;
+    public static boolean displayFixedRadars = true;
+    public static boolean displayRedLightRadars = true;
     public static int distanceAlert = 500;
-    private float zoom = 5;
+    private float zoom = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        displayFixedRadars = preferences.getBoolean("radar_fixe_switch", true);
+        displayRedLightRadars = preferences.getBoolean("radar_feu_switch", true);
+        zoom = Float.parseFloat(preferences.getString("pref_list_zoom_start", "0"));
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Button button = (Button)findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refreshMap();
+                refreshLocation();
+            }
+        });
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mClusterManager = new ClusterManager<>(this, mMap);
+        mMap.setOnCameraChangeListener(mClusterManager);
+        mMap.setOnMarkerClickListener(mClusterManager);
+        mClusterManager.setRenderer(new OwnRendering(getApplicationContext(), mMap, mClusterManager));
+        refreshLocation();
+        LoadRadarsAsyncTask task = new LoadRadarsAsyncTask(context, listView);
+        task.execute();
     }
 
     @Override
@@ -90,53 +117,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        preferenceGeneralZoom();
-
+        //preferenceGeneralZoom();
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             this.startActivity(intent);
-
-            Log.d("MENU Setting","yo je suis dans le menu setting");
+            Log.d("MENU Setting", "yo je suis dans le menu setting");
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        mClusterManager = new ClusterManager<Radar>(this, mMap);
-        mMap.setOnCameraChangeListener(mClusterManager);
-        mMap.setOnMarkerClickListener(mClusterManager);
-        mClusterManager.setRenderer(new OwnRendering(getApplicationContext(), mMap, mClusterManager));
-
-        refreshLocation();
-
-        LoadRadarsAsyncTask task = new LoadRadarsAsyncTask(context, listView);
-        task.execute();
-    }
-
+    /*
     public void preferenceGeneralZoom() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-
         boolean test2 = preferences.getBoolean("radar_fixe_switch", false);
         Log.d("test2", Boolean.toString(test2));
-
         String prefZoom = preferences.getString("pref_list_zoom_start", "0");
-
+        String zoom2 = prefZoom;
         refreshLocation();
-        zoom = Float.parseFloat(prefZoom);
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, Float.parseFloat(prefZoom)));
-        //mMap.animateCamera(CameraUpdateFactory.zoomTo(Integer.parseInt(prefZoom)), 2000, null);
-        Log.d("test3", prefZoom);
-    }
+        refreshMap();
+        Log.d("test3", zoom2);
+    }*/
 
     public void preferenceWidget() {
 
@@ -163,15 +165,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    private void refreshMap() {
+        displayFixedRadars = preferences.getBoolean("radar_fixe_switch", true);
+        displayRedLightRadars = preferences.getBoolean("radar_feu_switch", true);
+        zoom = Float.parseFloat(preferences.getString("pref_list_zoom_start", "0"));
+        mMap.clear();
+        mClusterManager.setRenderer(new OwnRendering(getApplicationContext(), mMap, mClusterManager));
+        mClusterManager.cluster();
+    }
+
     public static void addRadarsToMap(List<Radar> listRadars) {
         MapsActivity.listRadars = listRadars;
         for (Radar radar : listRadars) {
             MapsActivity.mClusterManager.addItem(radar);
-
         }
-
     }
-        /*for (Marker marker : radarFixe) {
-            marker.setVisible(false);
-            //marker.remove(); <-- works too! */
 }
