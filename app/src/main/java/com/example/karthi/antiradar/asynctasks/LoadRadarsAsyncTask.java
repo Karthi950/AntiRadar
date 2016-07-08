@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class LoadRadarsAsyncTask extends AsyncTask<Void, Void, List<Radar>> {
 
-    private final String SITE_RADARS_URL = "http://speedcamlocator.livehost.fr/radarFR";
+    private final String SITE_RADARS_URL = "http://speedcamlocator.livehost.fr/radarFandRL";
 
     private Context context;
     private ListView listView;
@@ -45,11 +45,22 @@ public class LoadRadarsAsyncTask extends AsyncTask<Void, Void, List<Radar>> {
             JSONArray jsonString = getJsonFromServer(SITE_RADARS_URL);
             for (int i = 0; i < jsonString.length(); i++) {
                 JSONObject radarJSON = jsonString.getJSONObject(i);
-                radarList.add(new Radar(BitmapDescriptorFactory.fromResource(R.drawable.cammin),
-                        Float.parseFloat(radarJSON.getString("Latitude")),
-                        Float.parseFloat(radarJSON.getString("Longitude")),
-                        radarJSON.getString("Vitesse")+ " km/h",
-                        "Radar Fixe"));
+                if (radarJSON.getString("TypeEtVitesse").equals(" RL-0") ){
+                    radarList.add(new Radar(BitmapDescriptorFactory.fromResource(R.drawable.redlight),
+                            Float.parseFloat(radarJSON.getString("Latitude")),
+                            Float.parseFloat(radarJSON.getString("Longitude")),
+                            "Radar feu rouge",
+                            ""));
+
+                }
+                else {
+                    radarList.add(new Radar(BitmapDescriptorFactory.fromResource(R.drawable.cammin),
+                            Float.parseFloat(radarJSON.getString("Latitude")),
+                            Float.parseFloat(radarJSON.getString("Longitude")),
+                            radarJSON.getString("Vitesse")+ " km/h",
+                            "Radar Fixe"));
+                }
+
             }
         }
         catch (IOException | JSONException error) {
