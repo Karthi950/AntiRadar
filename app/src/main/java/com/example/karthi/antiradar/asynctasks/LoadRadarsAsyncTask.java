@@ -57,8 +57,8 @@ public class LoadRadarsAsyncTask extends AsyncTask<Void, Void, List<Radar>> {
                     radarList.add(new Radar(BitmapDescriptorFactory.fromResource(R.drawable.cammin),
                             Float.parseFloat(radarJSON.getString("Latitude")),
                             Float.parseFloat(radarJSON.getString("Longitude")),
-                            radarJSON.getString("Vitesse")+ " km/h",
-                            "Radar Fixe"));
+                            "Radar Fixe",
+                            radarJSON.getString("Vitesse")+ " km/h"));
                 }
 
             }
