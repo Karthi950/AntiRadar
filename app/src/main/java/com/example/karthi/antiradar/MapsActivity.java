@@ -64,23 +64,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     /* Préférences */
 
-    private SharedPreferences preferences;
+    private static SharedPreferences preferences;
 
     private long timeUpdate = 10;
     private float distanceUpdate = 1;
     public static boolean displayFixedRadars = true;
     public static boolean displayRedLightRadars = true;
     public static int distanceAlert = 500;
-    private float zoom = 0;
+    private static float zoom = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        displayFixedRadars = preferences.getBoolean("radar_fixe_switch", true);
-        displayRedLightRadars = preferences.getBoolean("radar_feu_switch", true);
-        zoom = Float.parseFloat(preferences.getString("pref_list_zoom_start", "0"));
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -165,19 +163,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void refreshMap() {
+    private static void refreshMap() {
         displayFixedRadars = preferences.getBoolean("radar_fixe_switch", true);
         displayRedLightRadars = preferences.getBoolean("radar_feu_switch", true);
         zoom = Float.parseFloat(preferences.getString("pref_list_zoom_start", "0"));
-        mMap.clear();
-        mClusterManager.setRenderer(new OwnRendering(getApplicationContext(), mMap, mClusterManager));
+        mClusterManager.clearItems();
+        mClusterManager.addItems(getDisplayedRadars());
         mClusterManager.cluster();
     }
 
     public static void addRadarsToMap(List<Radar> listRadars) {
         MapsActivity.listRadars = listRadars;
-        for (Radar radar : listRadars) {
-            MapsActivity.mClusterManager.addItem(radar);
+        refreshMap();
+    }
+
+    private static List<Radar> getDisplayedRadars() {
+        List<Radar> radarList = new ArrayList<>();
+        for (Radar radar : MapsActivity.listRadars) {
+            if ((radar.getTitle().equals("Radar Fixe") && MapsActivity.displayFixedRadars == true)
+                    || (radar.getTitle().equals("Radar feu rouge") && MapsActivity.displayRedLightRadars == true)) {
+                MapsActivity.mClusterManager.addItem(radar);
+            }
         }
+        return (radarList);
     }
 }

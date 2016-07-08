@@ -23,13 +23,13 @@ public class OwnRendering extends DefaultClusterRenderer<Radar> {
     }
 
     protected void onBeforeClusterItemRendered(Radar item, MarkerOptions markerOptions) {
-        markerOptions.visible(false);
-        if (item.getTitle().equals("Radar Fixe") && MapsActivity.displayFixedRadars == true) {
+        markerOptions.visible(true);
+        /*if (item.getTitle().equals("Radar Fixe") && MapsActivity.displayFixedRadars == true) {
             markerOptions.visible(true);
         }
         else if (item.getTitle().equals("Radar feu rouge") && MapsActivity.displayRedLightRadars == true) {
             markerOptions.visible(true);
-        }
+        }*/
         markerOptions.icon(item.getIcon());
         markerOptions.snippet(item.getSnippet());
         markerOptions.title(item.getTitle());
