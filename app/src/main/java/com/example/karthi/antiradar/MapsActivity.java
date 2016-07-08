@@ -71,7 +71,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static int distanceAlert = 500;
     private float zoom = 5;
 
-    private Marker radarFixe;
 
 
     @Override
@@ -136,9 +135,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         String prefZoom = preferences.getString("pref_list_zoom_start", "0");
 
+<<<<<<< Updated upstream
         refreshLocation();
         zoom = Float.parseFloat(prefZoom);
         //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, Float.parseFloat(prefZoom)));
+=======
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, Float.parseFloat(prefZoom)));
+>>>>>>> Stashed changes
         //mMap.animateCamera(CameraUpdateFactory.zoomTo(Integer.parseInt(prefZoom)), 2000, null);
         Log.d("test3", prefZoom);
     }
@@ -172,6 +175,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         MapsActivity.listRadars = listRadars;
         for (Radar radar : listRadars) {
             MapsActivity.mClusterManager.addItem(radar);
+<<<<<<< Updated upstream
+=======
+
+        }
+
+        /*for (Radar radar : listRadars) {
+            MapsActivity.mClusterManager.removeItem(radar);
+        }*/
+
+        /* Si les radars fixes et feu sont desactivé**/
+       // MapsActivity.mClusterManager.clearItems();
+        LatLng latlng = new LatLng(50, 50);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, zoom));
+
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(zoom), 2000, null);
+    }
+>>>>>>> Stashed changes
 
         }
 
