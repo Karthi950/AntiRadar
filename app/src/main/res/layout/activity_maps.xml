@@ -35,7 +35,7 @@ android:gravity="center">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Text"
+            android:text="Vitesse"
             android:id="@+id/textView"
             android:layout_marginLeft="80dp"
             android:layout_marginStart="80dp"
@@ -46,7 +46,7 @@ android:gravity="center">
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Button"
+            android:text="Refresh"
             android:id="@+id/button"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"

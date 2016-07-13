@@ -34,6 +34,7 @@ import com.example.karthi.antiradar.model.OwnRendering;
 import com.example.karthi.antiradar.model.Radar;
 
 import com.example.karthi.antiradar.services.GPSLocator;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -46,6 +47,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.algo.GridBasedAlgorithm;
+import com.google.maps.android.clustering.algo.PreCachingAlgorithmDecorator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +61,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Location location;
     private GPSLocator gpsLocator = new GPSLocator();
     private static ClusterManager<Radar> mClusterManager;
+
     public static List<Radar> listRadars = new ArrayList<>();
     public ListView listView;
     public Context context;
@@ -72,6 +76,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static boolean displayRedLightRadars = true;
     public static int distanceAlert = 500;
     private static float zoom = 0;
+    GridBasedAlgorithm<Radar> gridAlgorithm = new GridBasedAlgorithm<Radar>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +88,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        //mClusterManager = new ClusterManager<>(this, mMap);
+        //mClusterManager.setRenderer(new OwnRendering(getApplicationContext(), mMap, mClusterManager));
         Button button = (Button)findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,8 +98,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 refreshLocation();
             }
         });
+
+
     }
 
+    public void onResume(){
+        super.onResume();
+
+        Log.d("COUCOU", "salut toi, je suis dans OnResume");
+
+        if (mClusterManager == null)
+            return;
+
+        refreshMap();
+
+    }
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -101,8 +120,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnCameraChangeListener(mClusterManager);
         mMap.setOnMarkerClickListener(mClusterManager);
         mClusterManager.setRenderer(new OwnRendering(getApplicationContext(), mMap, mClusterManager));
+
         refreshLocation();
         LoadRadarsAsyncTask task = new LoadRadarsAsyncTask(context, listView);
+    //    refreshMap();
         task.execute();
     }
 
@@ -170,11 +191,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mClusterManager.clearItems();
         mClusterManager.addItems(getDisplayedRadars());
         mClusterManager.cluster();
+
     }
 
     public static void addRadarsToMap(List<Radar> listRadars) {
         MapsActivity.listRadars = listRadars;
         refreshMap();
+        mClusterManager.setAlgorithm(new PreCachingAlgorithmDecorator<Radar>(new GridBasedAlgorithm<Radar>()));
+
     }
 
     private static List<Radar> getDisplayedRadars() {
@@ -187,4 +211,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         return (radarList);
     }
+
+
 }
