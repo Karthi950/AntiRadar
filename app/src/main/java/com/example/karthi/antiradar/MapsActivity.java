@@ -1,64 +1,55 @@
 package com.example.karthi.antiradar;
 
 import android.Manifest;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.content.Context;
-
 import android.location.Location;
-import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
-
-import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.karthi.antiradar.asynctasks.LoadRadarsAsyncTask;
 import com.example.karthi.antiradar.model.OwnRendering;
 import com.example.karthi.antiradar.model.Radar;
 
-import com.example.karthi.antiradar.services.GPSLocator;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
+import com.example.karthi.antiradar.widget.Widget;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.algo.GridBasedAlgorithm;
 import com.google.maps.android.clustering.algo.PreCachingAlgorithmDecorator;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements LocationListener, OnMapReadyCallback {
 
     private static GoogleMap mMap;
     private LocationManager locationManager;
     private Location location;
-    private GPSLocator gpsLocator = new GPSLocator();
     private static ClusterManager<Radar> mClusterManager;
+
+    public static LatLng currentLocation = new LatLng(0, 0);
+    public Date lastTimeUpdate = new Date();
 
     public static List<Radar> listRadars = new ArrayList<>();
     public ListView listView;
@@ -69,10 +60,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static SharedPreferences preferences;
 
     private long timeUpdate = 10;
-    public static int distanceUpdate = 200;
+    public static float distanceUpdate = 0.2F;
     public static boolean displayFixedRadars = true;
     public static boolean displayRedLightRadars = true;
-    private static float distanceAlert = 500;
+    public static float distanceAlert = 500;
     private static float zoom = 0;
     GridBasedAlgorithm<Radar> gridAlgorithm = new GridBasedAlgorithm<Radar>();
 
@@ -84,10 +75,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //mClusterManager = new ClusterManager<>(this, mMap);
-        //mClusterManager.setRenderer(new OwnRendering(getApplicationContext(), mMap, mClusterManager));
         Button button = (Button)findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,7 +85,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 refreshLocation();
             }
         });
-
     }
 
     public void onResume(){
@@ -106,6 +95,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         refreshMap();
         refreshLocation();
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -117,7 +107,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         refreshLocation();
         LoadRadarsAsyncTask task = new LoadRadarsAsyncTask(context, listView);
-    //    refreshMap();
         task.execute();
     }
 
@@ -144,20 +133,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mMap.setMyLocationEnabled(true);
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            distanceAlert = Float.parseFloat(preferences.getString("pref_alert_distance", "500"));
+
+            if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)) {
                 location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, timeUpdate, distanceUpdate, gpsLocator);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, timeUpdate, distanceUpdate, this);
+            }
 
-                System.out.println(location);
+            else if (locationManager.isProviderEnabled(locationManager.NETWORK_PROVIDER)) {
+                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, timeUpdate, distanceUpdate, this);
+            }
 
-                if (location != null) {
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(new LatLng(location.getLatitude(), location.getLongitude()))
-                            .zoom(zoom)
-                            .build();
-                    GPSLocator.currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                }
+            if (location != null) {
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(new LatLng(location.getLatitude(), location.getLongitude()))
+                        .zoom(zoom)
+                        .build();
+                currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+                calculeVitesse(location);
             }
         }
     }
@@ -168,7 +164,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         zoom = Float.parseFloat(preferences.getString("pref_list_zoom_start", "0"));
         distanceAlert = Float.parseFloat(preferences.getString("pref_alert_distance", "500"));
         mClusterManager.clearItems();
-        mClusterManager.addItems(getDisplayedRadars());
+        getDisplayedRadars();
         mClusterManager.cluster();
     }
 
@@ -178,16 +174,62 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mClusterManager.setAlgorithm(new PreCachingAlgorithmDecorator<Radar>(new GridBasedAlgorithm<Radar>()));
     }
 
-    private static List<Radar> getDisplayedRadars() {
-        List<Radar> radarList = new ArrayList<>();
+    private static void getDisplayedRadars() {
         for (Radar radar : MapsActivity.listRadars) {
             if ((radar.getTitle().equals("Radar Fixe") && MapsActivity.displayFixedRadars == true)
                     || (radar.getTitle().equals("Radar feu rouge") && MapsActivity.displayRedLightRadars == true)) {
                 MapsActivity.mClusterManager.addItem(radar);
             }
         }
-        return (radarList);
+    }
+
+    public double calculeVitesse(Location newLocation) {
+        float[] distanceInMeters = new float[1];
+        Location.distanceBetween(newLocation.getLatitude(), newLocation.getLongitude(), MapsActivity.currentLocation.latitude, MapsActivity.currentLocation.longitude, distanceInMeters);
+        double distance = distanceInMeters[0];
+        long difference = (lastTimeUpdate.getTime() - new Date().getTime()) / 1000; // Différence en secondes
+        double coeff = 3600 / (difference+1);
+        double vitesse = distance * coeff / 1000;
+        updateVitesse(vitesse);
+        return(vitesse);
+    }
+
+    private void updateVitesse(double vitesse) {
+        TextView vitesseLabel = (TextView) findViewById(R.id.textView);
+        vitesseLabel.setText("Vitesse : "+ vitesse);
+    }
+
+    public void onLocationChanged(final Location newLocation) {
+        double vitesse = calculeVitesse(newLocation);
+        int closeRadars = 0;
+        for (Radar radar : MapsActivity.listRadars) {
+            float[] distance = new float[1];
+            Location.distanceBetween(newLocation.getLatitude(), newLocation.getLongitude(), radar.getPosition().latitude, radar.getPosition().longitude, distance);
+            if (distance[0] <= MapsActivity.distanceAlert) {
+                closeRadars++;
+            }
+        }
+
+        Intent intent = new Intent(getApplicationContext(), Widget.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        intent.putExtra("VITESSE", vitesse);
+        intent.putExtra("CLOSERADARS", closeRadars);
+        int[] ids = AppWidgetManager.getInstance(getApplicationContext()).getAppWidgetIds(new ComponentName(getApplicationContext(), Widget.class));
+        if(ids != null && ids.length > 0) {
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+            getApplicationContext().sendBroadcast(intent);
+        }
+    }
+
+    public void onProviderDisabled(String provider) {
     }
 
 
+    public void onProviderEnabled(String provider) {
+    }
+
+
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
 }
