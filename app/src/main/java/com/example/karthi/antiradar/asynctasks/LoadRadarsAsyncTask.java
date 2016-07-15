@@ -51,7 +51,6 @@ public class LoadRadarsAsyncTask extends AsyncTask<Void, Void, List<Radar>> {
                             Float.parseFloat(radarJSON.getString("Longitude")),
                             "Radar feu rouge",
                             ""));
-
                 }
                 else {
                     radarList.add(new Radar(BitmapDescriptorFactory.fromResource(R.drawable.cammin),
@@ -60,11 +59,10 @@ public class LoadRadarsAsyncTask extends AsyncTask<Void, Void, List<Radar>> {
                             "Radar Fixe",
                             radarJSON.getString("Vitesse")+ " km/h"));
                 }
-
             }
         }
         catch (IOException | JSONException error) {
-            Log.d("jsonError ", error.getMessage());
+            System.out.println(error);
         }
         return (radarList);
     }
@@ -73,16 +71,13 @@ public class LoadRadarsAsyncTask extends AsyncTask<Void, Void, List<Radar>> {
     @Override
     protected void onPostExecute(List<Radar> result) {
         MapsActivity.addRadarsToMap(result);
-
     }
 
     public static JSONArray getJsonFromServer(String url) throws IOException {
 
         BufferedReader inputStream = null;
-
         URL jsonUrl = new URL(url);
         URLConnection dc = jsonUrl.openConnection();
-
         dc.setConnectTimeout(5000);
         dc.setReadTimeout(5000);
 
