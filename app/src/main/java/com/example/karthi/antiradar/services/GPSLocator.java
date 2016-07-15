@@ -20,7 +20,7 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class GPSLocator extends Service implements LocationListener {
 
-    public static LatLng currentLocation;
+    public static LatLng currentLocation = new LatLng(0, 0);
 
     Intent intent = new Intent();
 
@@ -46,11 +46,12 @@ public class GPSLocator extends Service implements LocationListener {
 
         int closeRadars = 0;
 
+        System.out.println(MapsActivity.listRadars.size());
         for (Radar radar : MapsActivity.listRadars) {
             //Location location = new Location("Radar");
             float[] distance = new float[1];
             Location.distanceBetween(newLocation.getLatitude(), newLocation.getLongitude(), radar.getPosition().latitude, radar.getPosition().longitude, distance);
-            System.out.println("Distance " + distance[0]);
+            System.out.println("Distance du radar " + distance[0]);
         }
 
         intent.putExtra("Latitude", newLocation.getLatitude());
@@ -59,12 +60,10 @@ public class GPSLocator extends Service implements LocationListener {
     }
 
     public void onProviderDisabled(String provider) {
-        //Toast.makeText(getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT).show();
     }
 
 
     public void onProviderEnabled(String provider) {
-        //Toast.makeText( getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
     }
 
 
