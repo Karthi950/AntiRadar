@@ -113,6 +113,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnCameraChangeListener(mClusterManager);
         mMap.setOnMarkerClickListener(mClusterManager);
         mClusterManager.setRenderer(new OwnRendering(getApplicationContext(), mMap, mClusterManager));
+        mMap.getUiSettings().setMapToolbarEnabled(false);
 
         refreshLocation();
         LoadRadarsAsyncTask task = new LoadRadarsAsyncTask(context, listView);
