@@ -21,7 +21,7 @@ import com.example.karthi.antiradar.R;
  */
 public class Widget extends AppWidgetProvider {
 
-    private double actualSpeed;
+    private float actualSpeed;
 
     @Override
     public void onEnabled(Context context) {
@@ -42,10 +42,12 @@ public class Widget extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
-        actualSpeed = extras.getDouble("VITESSE");
-        if (extras.getInt("CLOSERADARS") > 0) {
-            Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-            v.vibrate(500);
+        if (intent.getExtras() != null) {
+            actualSpeed = extras.getFloat("VITESSE");
+            if (extras.getInt("CLOSERADARS") > 0) {
+                Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(500);
+            }
         }
         super.onReceive(context, intent);
     }

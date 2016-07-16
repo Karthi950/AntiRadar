@@ -40,7 +40,6 @@ import com.google.maps.android.clustering.algo.PreCachingAlgorithmDecorator;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements LocationListener, OnMapReadyCallback {
@@ -51,8 +50,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
     private static ClusterManager<Radar> mClusterManager;
 
     public static LatLng currentLocation = new LatLng(0, 0);
-    public Date lastTimeUpdate = new Date();
-
     public static List<Radar> listRadars = new ArrayList<>();
     public ListView listView;
     public Context context;
@@ -155,7 +152,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
                 currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                calculeVitesse(location);
+                updateVitesse(location.getSpeed());
             }
         }
     }
@@ -185,28 +182,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
         }
     }
 
-    public double calculeVitesse(Location newLocation) {
-        float[] distanceInMeters = new float[1];
-        Location.distanceBetween(newLocation.getLatitude(), newLocation.getLongitude(), MapsActivity.currentLocation.latitude, MapsActivity.currentLocation.longitude, distanceInMeters);
-        double distance = distanceInMeters[0];
-        long difference = (lastTimeUpdate.getTime() - new Date().getTime()) / 1000; // Différence en secondes
-        double coeff = 3600 / (difference+1);
-        double vitesse = distance * coeff / 1000;
-        vitesse = round(vitesse, 2);
-        if (vitesse < 0) {
-            vitesse = 0;
-        }
-        updateVitesse(vitesse);
-        return(vitesse);
-    }
-
-    private void updateVitesse(double vitesse) {
+    private void updateVitesse(float vitesse) {
         TextView vitesseLabel = (TextView) findViewById(R.id.textView);
-        vitesseLabel.setText("Vitesse : "+ vitesse);
+        vitesseLabel.setText("Vitesse : "+ vitesse +" km/h");
     }
 
     public void onLocationChanged(final Location newLocation) {
-        double vitesse = calculeVitesse(newLocation);
+        float vitesse = newLocation.getSpeed();
         int closeRadars = 0;
         for (Radar radar : MapsActivity.listRadars) {
             float[] distance = new float[1];
