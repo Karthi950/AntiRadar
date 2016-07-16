@@ -58,7 +58,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
 
     private static SharedPreferences preferences;
 
-    private long timeUpdate = 10;
+    private long timeUpdate = 5000;
     public static float distanceUpdate = 0.2F;
     public static boolean displayFixedRadars = true;
     public static boolean displayRedLightRadars = true;
