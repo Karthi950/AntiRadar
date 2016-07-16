@@ -37,6 +37,8 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.algo.GridBasedAlgorithm;
 import com.google.maps.android.clustering.algo.PreCachingAlgorithmDecorator;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -190,6 +192,10 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
         long difference = (lastTimeUpdate.getTime() - new Date().getTime()) / 1000; // Différence en secondes
         double coeff = 3600 / (difference+1);
         double vitesse = distance * coeff / 1000;
+        vitesse = round(vitesse, 2);
+        if (vitesse < 0) {
+            vitesse = 0;
+        }
         updateVitesse(vitesse);
         return(vitesse);
     }
@@ -231,5 +237,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
 
     public void onStatusChanged(String provider, int status, Bundle extras) {
 
+    }
+
+    public double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }
