@@ -1,18 +1,15 @@
 package com.example.karthi.antiradar.widget;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.os.Vibrator;
-import android.util.Log;
+
 import android.widget.RemoteViews;
-import android.widget.TextView;
 
 import com.example.karthi.antiradar.R;
 
@@ -22,6 +19,8 @@ import com.example.karthi.antiradar.R;
 public class Widget extends AppWidgetProvider {
 
     private float actualSpeed;
+    private int radarCount = 0;
+    private Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
     @Override
     public void onEnabled(Context context) {
@@ -31,7 +30,7 @@ public class Widget extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         RemoteViews remoteViews = new RemoteViews(context.getApplicationContext().getPackageName(), R.layout.widget_layout);
-        remoteViews.setTextViewText(R.id.widget_label, "Vitesse : "+actualSpeed+" km/h");
+        remoteViews.setTextViewText(R.id.widget_label, "Vitesse : "+actualSpeed+" km/h\nNombre de radars à proximité : "+radarCount);
 
         for (int i = 0; i< appWidgetIds.length; i++) {
             appWidgetManager.updateAppWidget(appWidgetIds[i], remoteViews);
@@ -45,8 +44,8 @@ public class Widget extends AppWidgetProvider {
         if (intent.getExtras() != null) {
             actualSpeed = extras.getFloat("VITESSE");
             if (extras.getInt("CLOSERADARS") > 0) {
-                Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-                v.vibrate(500);
+                radarCount = extras.getInt("CLOSERADARS");
+                RingtoneManager.getRingtone(context, notification).play();
             }
         }
         super.onReceive(context, intent);

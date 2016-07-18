@@ -37,8 +37,6 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.algo.GridBasedAlgorithm;
 import com.google.maps.android.clustering.algo.PreCachingAlgorithmDecorator;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +47,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
     private Location location;
     private static ClusterManager<Radar> mClusterManager;
 
-    public static LatLng currentLocation = new LatLng(0, 0);
     public static List<Radar> listRadars = new ArrayList<>();
     public ListView listView;
     public Context context;
@@ -105,6 +102,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
         mMap.getUiSettings().setMapToolbarEnabled(false);
 
         refreshLocation();
+
         LoadRadarsAsyncTask task = new LoadRadarsAsyncTask(context, listView);
         task.execute();
     }
@@ -149,7 +147,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
                         .target(new LatLng(location.getLatitude(), location.getLongitude()))
                         .zoom(zoom)
                         .build();
-                currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
                 updateVitesse(location.getSpeed());
@@ -198,6 +195,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
             }
         }
 
+        TextView vitesseLabel = (TextView) findViewById(R.id.textView);
+        vitesseLabel.setText("Vitesse : "+ vitesse +" km/h\nNombre de radars à proximité : "+closeRadars);
+
         Intent intent = new Intent(getApplicationContext(), Widget.class);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         intent.putExtra("VITESSE", vitesse);
@@ -207,6 +207,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
             getApplicationContext().sendBroadcast(intent);
         }
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(new LatLng(newLocation.getLatitude(), newLocation.getLongitude()))
+                .zoom(zoom)
+                .build();
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     public void onProviderDisabled(String provider) {
@@ -219,12 +225,5 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
 
     public void onStatusChanged(String provider, int status, Bundle extras) {
 
-    }
-
-    public double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-        BigDecimal bd = new BigDecimal(value);
-        bd = bd.setScale(places, RoundingMode.HALF_UP);
-        return bd.doubleValue();
     }
 }

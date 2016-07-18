@@ -3,7 +3,6 @@ package com.example.karthi.antiradar.asynctasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.ListView;
 
 import com.example.karthi.antiradar.MapsActivity;
