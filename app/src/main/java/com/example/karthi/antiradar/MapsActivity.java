@@ -225,12 +225,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
             getApplicationContext().sendBroadcast(intent);
         }
-
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(newLocation.getLatitude(), newLocation.getLongitude()))
-                .zoom(zoom)
-                .build();
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     public void onProviderDisabled(String provider) {
