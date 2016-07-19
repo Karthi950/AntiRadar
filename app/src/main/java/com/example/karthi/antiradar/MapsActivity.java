@@ -196,7 +196,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
         }
 
         TextView vitesseLabel = (TextView) findViewById(R.id.textView);
-        vitesseLabel.setText("Vitesse : "+ vitesse +" km/h\nNombre de radars à proximité : "+closeRadars);
+        vitesseLabel.setText("Vitesse : "+ vitesse +" km/h\n"+R.drawable.cammin+closeRadars);
 
         Intent intent = new Intent(getApplicationContext(), Widget.class);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);

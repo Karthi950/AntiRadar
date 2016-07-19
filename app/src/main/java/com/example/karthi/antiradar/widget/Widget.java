@@ -9,6 +9,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 
+import android.os.Vibrator;
 import android.widget.RemoteViews;
 
 import com.example.karthi.antiradar.R;
@@ -45,6 +46,8 @@ public class Widget extends AppWidgetProvider {
             actualSpeed = extras.getFloat("VITESSE");
             if (extras.getInt("CLOSERADARS") > 0) {
                 radarCount = extras.getInt("CLOSERADARS");
+                Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(500);
                 RingtoneManager.getRingtone(context, notification).play();
             }
         }
