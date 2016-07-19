@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.content.Context;
 import android.location.Location;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -52,6 +54,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
     public ListView listView;
     public Context context;
 
+
     /* Préférences */
 
     private static SharedPreferences preferences;
@@ -72,9 +75,17 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        ImageView radarIcon = (ImageView) findViewById(R.id.radarIcon);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            radarIcon.setImageDrawable(getDrawable(R.drawable.cammin));
+        }
+
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Button button = (Button)findViewById(R.id.button);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -197,7 +208,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
         }
 
         TextView vitesseLabel = (TextView) findViewById(R.id.textView);
-        vitesseLabel.setText("Vitesse : "+ vitesse +" km/h\n"+R.drawable.cammin+closeRadars);
+        vitesseLabel.setText("Vitesse : "+ vitesse +" km/h");
+
+        TextView radarNumberTxtView = (TextView) findViewById(R.id.radarNumber);
+        if(radarNumberTxtView != null){
+            radarNumberTxtView.setText(String.valueOf(closeRadars));
+        }
 
         Intent intent = new Intent(getApplicationContext(), Widget.class);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
