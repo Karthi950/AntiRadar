@@ -80,9 +80,10 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
             radarIcon.setImageDrawable(getDrawable(R.drawable.cammin));
         }
 
-
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            toolbar.setNavigationIcon(getDrawable(R.drawable.ic_launcher));
+        }
         setSupportActionBar(toolbar);
         Button button = (Button)findViewById(R.id.button);
 
