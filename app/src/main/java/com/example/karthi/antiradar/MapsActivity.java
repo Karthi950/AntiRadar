@@ -62,7 +62,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
     public static boolean displayRedLightRadars = true;
     public static float distanceAlert = 500;
     private static float zoom = 0;
-    GridBasedAlgorithm<Radar> gridAlgorithm = new GridBasedAlgorithm<Radar>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,7 +185,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener,
     }
 
     public void onLocationChanged(final Location newLocation) {
-        float vitesse = newLocation.getSpeed();
+
+        int vitesse = Math.round(newLocation.getSpeed()*3.6f); //  m/s en km/h
         int closeRadars = 0;
         for (Radar radar : MapsActivity.listRadars) {
             float[] distance = new float[1];

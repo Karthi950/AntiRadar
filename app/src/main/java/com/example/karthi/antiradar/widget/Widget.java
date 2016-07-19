@@ -19,7 +19,7 @@ import com.example.karthi.antiradar.R;
  */
 public class Widget extends AppWidgetProvider {
 
-    private float actualSpeed;
+    private int actualSpeed;
     private int radarCount = 0;
     private Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
@@ -43,7 +43,7 @@ public class Widget extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
         if (intent.getExtras() != null) {
-            actualSpeed = extras.getFloat("VITESSE");
+            actualSpeed = extras.getInt("VITESSE");
             if (extras.getInt("CLOSERADARS") > 0) {
                 radarCount = extras.getInt("CLOSERADARS");
                 Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
