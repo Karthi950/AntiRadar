@@ -1,4 +1,4 @@
-package com.example.karthi.antiradar;
+package com.example.karthi.antiradar.Settings;
 
 
 import android.annotation.TargetApi;
@@ -23,6 +23,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+
+import com.example.karthi.antiradar.R;
 
 import java.util.List;
 
