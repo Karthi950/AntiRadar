@@ -1,4 +1,4 @@
-package com.example.karthi.antiradar;
+package com.example.karthi.antiradar.Settings;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
